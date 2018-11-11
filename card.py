@@ -10,8 +10,5 @@ class Card():
     def is_same_color(self, other):
         return self.color == other.color
 
-    def is_same_house(self, other):
-        return self.house == other.house
-
     def __str__(self):
         return self.num + " of " + self.house + " | " + self.color

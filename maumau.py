@@ -70,13 +70,18 @@ class Maumau:
                 if(self.compare_card_with_top_of_pile(curr_player.hand[card_index])):
                     self.pile_of_cards.add_card_to_stack(
                         curr_player.play_card(card_index))
+                    if curr_player.last_card():
+                        print("MAUMAU!")
                     print("played card:", self.pile_of_cards.top())
                     break
                 elif card_drawn:
-                    print("No card played")
+                    print("No card has been played")
                     break
                 else:
                     print("Card cannot be played! Choose another card.")
+            if curr_player.hand_is_empty():
+                print(curr_player.name, "has won")
+                break
             players_turn = (players_turn + 1) % self.amount_of_players
             input("next turn")
 

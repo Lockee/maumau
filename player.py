@@ -8,6 +8,12 @@ class Player():
 
     def add_card_to_hand(self, card):
         self.hand.append(card)
+    
+    def last_card(self):
+        return len(self.hand) == 1
+
+    def hand_is_empty(self):
+        return len(self.hand) == 0
 
     def __len__(self):
         return len(self.hand)
