@@ -20,6 +20,12 @@ class Deck:
     def add_card_to_stack(self, card):
         self.deck.append(card)
 
+    def top(self):
+        return self.deck[-1]
+
+    def add_stack_to_deck(self, stack):
+        self.deck += stack
+
     def shuffle(self):
         random.shuffle(self.deck)
 
