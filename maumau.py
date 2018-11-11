@@ -1,18 +1,22 @@
 import player
-import deck
+import stackOfCards
 import sys
 import os
 
 
 class Maumau:
     def __init__(self, amount_of_players=2):
-        self.deck_of_cards = deck.Deck(False)
-        self.pile_of_cards = deck.Deck(True)
+        """initializes the game, creates 2 deck object and adds the given
+            amount of players, each player is given cards from the deck"""
+        self.deck_of_cards = stackOfCards.StackOfCards(False)
+        self.pile_of_cards = stackOfCards.StackOfCards(True)
         self.amount_of_players = amount_of_players
         self.players = []
 
         for i in range(self.amount_of_players):
-            self.add_player()
+            player_name = input("Please state your name player"+str(i+1)+": ")
+            new_player = player.Player(player_name)
+            self.add_player(new_player)
 
         self.deal_cards_to_players()
         self.pile_of_cards.add_card_to_stack(self.deck_of_cards.draw())
@@ -26,18 +30,24 @@ class Maumau:
                 i += 1
 
     def add_pile_to_deck(self):
-        new_pile = deck.Deck(True, [self.pile_of_cards.draw()])
+        """adds every but the last card object from the pile to the deck"""
+        new_pile = stackOfCards.StackOfCards(True, [self.pile_of_cards.draw()])
         self.deck_of_cards.add_stack_to_deck(self.pile_of_cards)
         self.pile_of_cards = new_pile
 
-    def compare_card_with_top_of_pile(self, card):
+    def is_card_valid(self, card):
+        """compares the card with the last card of the pile"""
         return self.pile_of_cards.card_is_playable(card)
 
-    def add_player(self):
-        player_name = input("Please state your name player"+str(len(self.players)+1)+": ")
-        self.players.append(player.Player(player_name))
+    def add_player(self, new_player):
+        """adds a player to the game"""
+        self.players.append(new_player)
 
     def score_count(self):
+        """adds a scoure to the players based on their cards left:
+            5 Points for a card with a number
+            10 Points for a Jack, Queen or a King
+            15 Points for an Ace"""
         for player in self.players:
             for card in player.hand:
                 if card.num.isdigit():
@@ -50,14 +60,16 @@ class Maumau:
         print("Your Score: ")
         for i, player in enumerate(self.players):
             print(str(i+1)+".", player.name + ":", str(player.score))
-                
+
     def start_game(self):
+        """Starts a game of MauMau - it's the games Skeleton"""
         players_turn = 0
-        while True:
+        while True:  # Game Loop
             self.clear_screen()
-            if self.deck_of_cards.is_empty():
+            if self.deck_of_cards.is_empty():   # pile reshuffeld into deck
                 self.add_pile_to_deck()
                 self.deck_of_cards.shuffle()
+            # ==== info prints ====
             print("Amount of cards in deck left:", len(self.deck_of_cards))
             print("Amount of cards on pile:", len(self.pile_of_cards))
             top_card = self.pile_of_cards.top()
@@ -66,7 +78,7 @@ class Maumau:
                 if player is curr_player:
                     continue
                 print("Amount of cards in", player.name + "s hand:", len(player))
-                
+
             print("===Top of Pile===")
             print(top_card)
             print("=================")
@@ -74,7 +86,8 @@ class Maumau:
             print(curr_player, "d. Draw a Card", sep="")
             card_index = -1
             card_drawn = False
-            while True:
+
+            while True:  # player input loop
                 card_index = input("Which card do you want to play?: ")
                 if card_index.isdigit():
                     card_index = int(card_index) - 1
@@ -90,20 +103,20 @@ class Maumau:
                 else:
                     print("Please enter valid input")
                     continue
-                
-                if(self.compare_card_with_top_of_pile(curr_player.hand[card_index])):
+                # put card into pile
+                if(self.is_card_valid(curr_player.hand[card_index])):  # card can be played on pile
                     self.pile_of_cards.add_card_to_stack(
                         curr_player.play_card(card_index))
                     if curr_player.last_card():
                         print("Mau!")
                     print("played card:", self.pile_of_cards.top())
                     break
-                elif card_drawn:
+                elif card_drawn:    # card was drawn and cannot be placed on the pile
                     print("No card has been played")
                     break
-                else:
+                else:           # card is not valid
                     print("Card cannot be played! Choose another card.")
-            if curr_player.hand_is_empty():
+            if curr_player.hand_is_empty():  # winning condition, players hand is empty
                 print("Mau Mau!")
                 self.score_count()
                 break
@@ -112,4 +125,5 @@ class Maumau:
 
     @staticmethod
     def clear_screen():
+        """clears terminal for every os"""
         os.system('clear') if sys.platform != "windows" else os.system('cls')
