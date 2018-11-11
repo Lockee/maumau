@@ -14,8 +14,8 @@ class Deck:
         return self.deck.pop()
 
     def card_is_playable(self, card):
-        open_card = self.deck[-1]
-        return open_card.is_same_number(card) or open_card.is_same_color(card)
+        top_card = self.top()
+        return top_card.is_same_number(card) or top_card.is_same_color(card)
 
     def add_card_to_stack(self, card):
         self.deck.append(card)

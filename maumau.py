@@ -30,6 +30,9 @@ class Maumau:
         self.deck_of_cards.add_stack_to_deck(self.pile_of_cards)
         self.pile_of_cards = new_pile
 
+    def compare_card_with_top_of_pile(self, card):
+        return self.pile_of_cards.card_is_playable(card)
+
     def add_player(self):
         player_name = input("Please state your name player"+str(len(self.players)+1)+": ")
         self.players.append(player.Player(player_name))
@@ -44,20 +47,36 @@ class Maumau:
             print(top_card)
             print("=================")
             print("it's", curr_player.name + "s", "turn.\n")
-            print(curr_player)
-            curr_player_card_index = -1
+            print(curr_player, "d. Draw a Card", sep="")
+            card_index = -1
+            card_drawn = False
             while True:
-                try:
-                    curr_player_card_index = int(input("Which card do you want to play?: ")) - 1
-                    if curr_player_card_index >= len(curr_player) or curr_player_card_index < 0:
+                card_index = input("Which card do you want to play?: ")
+                if card_index.isdigit():
+                    card_index = int(card_index) - 1
+                    if card_index >= len(curr_player) or card_index < 0:
                         print("Number does not fit your hand! Please state a valid card.")
-                    else:
-                        break
-                except ValueError:
-                    print("please only enter a valid number.")
-            self.pile_of_cards.add_card_to_stack(curr_player.play_card(curr_player_card_index))
-            print("played card:", self.pile_of_cards.top())
-            print(curr_player)
+                        continue
+                elif card_index.lower() == "d":
+                    drawn_card = self.deck_of_cards.draw()
+                    print(drawn_card, "has been drawn")
+                    curr_player.add_card_to_hand(drawn_card)
+                    card_index = -1
+                    card_drawn = True
+                else:
+                    print("Please enter valid input")
+                    continue
+                
+                if(self.compare_card_with_top_of_pile(curr_player.hand[card_index])):
+                    self.pile_of_cards.add_card_to_stack(
+                        curr_player.play_card(card_index))
+                    print("played card:", self.pile_of_cards.top())
+                    break
+                elif card_drawn:
+                    print("No card played")
+                    break
+                else:
+                    print("Card cannot be played! Choose another card.")
             players_turn = (players_turn + 1) % self.amount_of_players
             input("next turn")
 
