@@ -3,9 +3,9 @@ import random
 
 
 class Deck:
-    def __init__(self, is_stack):
+    def __init__(self, is_stack, cards=[]):
         self.deck = []
-
+        self.deck += cards
         if not is_stack:
             self.initalise_deck()
             self.shuffle()
@@ -24,7 +24,10 @@ class Deck:
         return self.deck[-1]
 
     def add_stack_to_deck(self, stack):
-        self.deck += stack
+        self.deck += stack.deck
+
+    def is_empty(self):
+        return len(self.deck) == 0
 
     def shuffle(self):
         random.shuffle(self.deck)

@@ -26,7 +26,7 @@ class Maumau:
                 i += 1
 
     def add_pile_to_deck(self):
-        new_pile = [self.pile_of_cards.draw()]
+        new_pile = deck.Deck(True, [self.pile_of_cards.draw()])
         self.deck_of_cards.add_stack_to_deck(self.pile_of_cards)
         self.pile_of_cards = new_pile
 
@@ -37,10 +37,29 @@ class Maumau:
         player_name = input("Please state your name player"+str(len(self.players)+1)+": ")
         self.players.append(player.Player(player_name))
 
+    def score_count(self):
+        for player in self.players:
+            for card in player.hand:
+                if card.num.isdigit():
+                    player.score += 5
+                elif card.num == "Ace":
+                    player.score += 15
+                else:
+                    player.score += 10
+        self.players.sort(key=lambda player: player.score)
+        print("Your Score: ")
+        for i, player in enumerate(self.players):
+            print(str(i+1)+".", player.name + ":", str(player.score))
+                
     def start_game(self):
         players_turn = 0
         while True:
             self.clear_screen()
+            if self.deck_of_cards.is_empty():
+                self.add_pile_to_deck()
+                self.deck_of_cards.shuffle()
+            print("Amount of cards in deck left:", len(self.deck_of_cards))
+            print("Amount of cards on pile:", len(self.pile_of_cards))
             top_card = self.pile_of_cards.top()
             curr_player = self.players[players_turn]
             print("===Top of Pile===")
@@ -80,7 +99,7 @@ class Maumau:
                 else:
                     print("Card cannot be played! Choose another card.")
             if curr_player.hand_is_empty():
-                print(curr_player.name, "has won")
+                self.score_count()
                 break
             players_turn = (players_turn + 1) % self.amount_of_players
             input("next turn")
