@@ -62,6 +62,11 @@ class Maumau:
             print("Amount of cards on pile:", len(self.pile_of_cards))
             top_card = self.pile_of_cards.top()
             curr_player = self.players[players_turn]
+            for player in self.players:
+                if player is curr_player:
+                    continue
+                print("Amount of cards in", player.name + "s hand:", len(player))
+                
             print("===Top of Pile===")
             print(top_card)
             print("=================")
@@ -90,7 +95,7 @@ class Maumau:
                     self.pile_of_cards.add_card_to_stack(
                         curr_player.play_card(card_index))
                     if curr_player.last_card():
-                        print("MAUMAU!")
+                        print("Mau!")
                     print("played card:", self.pile_of_cards.top())
                     break
                 elif card_drawn:
@@ -99,6 +104,7 @@ class Maumau:
                 else:
                     print("Card cannot be played! Choose another card.")
             if curr_player.hand_is_empty():
+                print("Mau Mau!")
                 self.score_count()
                 break
             players_turn = (players_turn + 1) % self.amount_of_players
