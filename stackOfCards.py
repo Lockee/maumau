@@ -32,7 +32,7 @@ class StackOfCards:
         """returns last card object in deck"""
         return self.deck[-1]
 
-    def add_stack_to_deck(self, stack):
+    def pile_onto_deck(self, stack):
         """adds the cards of another StackOfCards object to itself"""
         self.deck += stack.deck
 
@@ -54,6 +54,7 @@ class StackOfCards:
         numbers = ["7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
         houses = ["Hearts", "Spades", "Diamonds", "Clubs"]
         colors = ["red", "black"]
+        self.deck = []
         i = 0
         for house in houses:
             for number in numbers:
