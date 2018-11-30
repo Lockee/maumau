@@ -1,16 +1,16 @@
-"""Stack of Cards is a class which contains a list of cards objects"""
+"""pile of cards is a class which contains a list of cards objects"""
 
 import card
 import random
 
 
 class StackOfCards:
-    def __init__(self, is_stack, cards=[]):
+    def __init__(self, is_pile, cards=[]):
         """initialise a deck or pile of cards,
         a deck when first created is filled with a normal skat game"""
         self.deck = []
         self.deck += cards
-        if not is_stack:
+        if not is_pile:
             self.initalise_deck()
             self.shuffle()
 
@@ -24,7 +24,7 @@ class StackOfCards:
         top_card = self.top()
         return top_card.is_same_number(card) or top_card.is_same_color(card)
 
-    def add_card_to_stack(self, card):
+    def add_card_to_deck(self, card):
         """adds a card object to the deck"""
         self.deck.append(card)
 
@@ -32,9 +32,9 @@ class StackOfCards:
         """returns last card object in deck"""
         return self.deck[-1]
 
-    def pile_onto_deck(self, stack):
-        """adds the cards of another StackOfCards object to itself"""
-        self.deck += stack.deck
+    def pile_onto_deck(self, pile):
+        """adds the deck of one stackofCards to its own"""
+        self.deck += pile.deck
 
     def is_empty(self):
         """returns true if deck list is empty"""

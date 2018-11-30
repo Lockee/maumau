@@ -10,19 +10,19 @@ class Maumau:
             amount of players, each player is given cards from the deck"""
         self.deck_of_cards = stackOfCards.StackOfCards(False)
         self.pile_of_cards = stackOfCards.StackOfCards(True)
-        self.amount_of_players = self.set_amount_of_players()
+        self.amount_of_players = 0
         self.players = []
-        self.turn = 0
+        self.turn = -1
         self.curr_player = None
-      
-        self.name_players()
-        self.deal_cards_to_players()
-        self.pile_of_cards.add_card_to_stack(self.deck_of_cards.draw())
+        self.card_was_drawn = False
+        self.card_index = -1
 
     def name_players(self):
         self.players = []
         for i in range(self.amount_of_players):
             player_name = input("Please state your name player"+str(i+1)+": ")
+            if player_name == "":  # no name given
+                player_name = "Player" + str(i+1)   
             new_player = player.Player(player_name)
             self.players.append(new_player)
 
@@ -35,7 +35,14 @@ class Maumau:
                 print("the number has to be between 2 and 4")
 
     def deal_cards_to_players(self):
-        amount_of_cards = 7 - len(self.players)
+        amount_of_cards = 0
+        while True:
+            amount = input("How many cards should the players have at the start(3-5)?: ")
+            if amount.isdigit() and 2 < int(amount) <= 5:
+                amount_of_cards = int(amount)
+                break
+            else:
+                print("Please enter a number between 3 and 5") 
         for player in self.players:
             i = 0
             while i < amount_of_cards:
@@ -48,21 +55,20 @@ class Maumau:
         self.deck_of_cards.pile_onto_deck(self.pile_of_cards)
         self.pile_of_cards = new_pile
 
-    def is_card_valid(self, card):
-        """compares the card with the last card of the pile"""
-        return self.pile_of_cards.card_is_playable(card)
-
     def rule_card_seven(self):
+        """ TODO: Add rule for a seven"""
         pass
 
     def rule_card_eight(self):
+        """ TODO: Add rule for a eight"""
         pass
 
     def rule_card_jack(self):
+        """ TODO: Add rule for a jack"""
         pass
 
     def score_count(self):
-        """adds a scoure to the players based on their cards left:
+        """adds a score to the players based on their cards left:
             Cards 7-10 Points corresponding to their print
             10 Points for a Queen or a King
             11 Points for an Ace
@@ -83,93 +89,92 @@ class Maumau:
             print(str(i+1)+".", player.name + ":", str(player.score))
 
     def next_turn(self):
-        # TODO: add to logic
-        self.turn = (self.turn + 1) % 4
+        """Initiates the next turn for the game"""
+        self.clear_screen()
+        self.reshuffle_deck()
+        self.turn = (self.turn + 1) % self.amount_of_players
         self.curr_player = self.players[self.turn]
+        self.card_was_drawn = False
 
     def reshuffle_deck(self):
-        if self.deck_of_cards.is_empty():   # pile reshuffeld into deck
+        """if the deck is empty, the pile, without the open card,
+           will be reshuffled into the deck"""
+        if self.deck_of_cards.is_empty():
                 self.add_pile_to_deck()
                 self.deck_of_cards.shuffle()
 
-    def player_action(self):
-        # TODO: replace in logic
-        while True:
+    def info_prints(self):
+        print("Amount of cards in deck left:", len(self.deck_of_cards))
+        print("Amount of cards on pile:", len(self.pile_of_cards))
+        top_card = self.pile_of_cards.top()
+        for player in self.players:
+            if player is self.curr_player:
+                continue
+            print("Amount of cards in", player.name + "s hand:", len(player))
+        print("===Top of Pile===")
+        print(top_card)
+        print("=================")
+        print("it's", self.curr_player.name + "s", "turn.\n")
+        print(self.curr_player, "d. Draw a Card", sep="")
+
+    def player_chooses_option(self):
+        while True:  # run as long as input is invalid
             card_index = input("Which card do you want to play?: ")
             if card_index.isdigit():
-                card_index = int(card_index) - 1
-                if card_index >= len(self.curr_player) or card_index < 0:
-                    print("Number does not fit your hand! Please state a valid card.")
+                self.card_index = int(card_index) - 1
+                if self.card_index >= len(self.curr_player) or self.card_index < 0:
+                    print("Please state a valid option.")
+                    continue
+                if not self.pile_of_cards.card_is_playable(self.curr_player.hand[self.card_index]):
+                    print("Card is cannot be played, choose another card!")
                     continue
             elif card_index.lower() == "d":
-                drawn_card = self.deck_of_cards.draw()
-                print(drawn_card, "has been drawn")
-                self.curr_player.add_card_to_hand(drawn_card)
-                card_index = -1
-                card_drawn = True
+                self.card_was_drawn = True
             else:
-                print("Please enter valid input")
+                print("Invalid input, try again")
                 continue
+            break
 
-    def start_game(self):
-        """Starts a game of MauMau - it's the games Skeleton"""
-        players_turn = 0
-        while True:  # Game Loop
-            self.clear_screen()
-            self.reshuffle_deck()
-            # ==== info prints ====
-            print("Amount of cards in deck left:", len(self.deck_of_cards))
-            print("Amount of cards on pile:", len(self.pile_of_cards))
-            top_card = self.pile_of_cards.top()
-            curr_player = self.players[players_turn]
-            for player in self.players:
-                if player is curr_player:
-                    continue
-                print("Amount of cards in", player.name + "s hand:", len(player))
+    def evaluate_option(self):
+        if self.card_was_drawn:
+            drawn_card = self.deck_of_cards.draw()
+            print(drawn_card, "has been drawn.")
+            if(self.pile_of_cards.card_is_playable(drawn_card)):
+                play = ""
+                while play != "y" and play != "n":
+                    play = input("do you want to play it? (y)es or (n)o: ").lower()
+                    if play == "y":
+                        self.pile_of_cards.add_card_to_deck(drawn_card)
+                    elif play == "n":
+                        print(drawn_card, "will be added to your hand")
+                        self.curr_player.add_card_to_hand(drawn_card)
+                        print("No card has been played")
+                        return
+                    else:
+                        print("please enter a valid option")
+        else:
+            self.pile_of_cards.add_card_to_deck(
+                        self.curr_player.play_card(self.card_index))
+            if self.curr_player.last_card():
+                print("Mau!")
+        print("played card:", self.pile_of_cards.top())
 
-            print("===Top of Pile===")
-            print(top_card)
-            print("=================")
-            print("it's", curr_player.name + "s", "turn.\n")
-            print(curr_player, "d. Draw a Card", sep="")
-            card_index = -1
-            card_drawn = False
-
-            while True:  # player input loop
-                card_index = input("Which card do you want to play?: ")
-                if card_index.isdigit():
-                    card_index = int(card_index) - 1
-                    if card_index >= len(curr_player) or card_index < 0:
-                        print("Number does not fit your hand! Please state a valid card.")
-                        continue
-                elif card_index.lower() == "d":
-                    drawn_card = self.deck_of_cards.draw()
-                    print(drawn_card, "has been drawn")
-                    curr_player.add_card_to_hand(drawn_card)
-                    card_index = -1
-                    card_drawn = True
-                else:
-                    print("Please enter valid input")
-                    continue
-                # put card into pile
-                if(self.is_card_valid(curr_player.hand[card_index])):  # card can be played on pile
-                    self.pile_of_cards.add_card_to_stack(
-                        curr_player.play_card(card_index))
-                    if curr_player.last_card():
-                        print("Mau!")
-                    print("played card:", self.pile_of_cards.top())
-                    break
-                elif card_drawn:    # card was drawn and cannot be placed on the pile
-                    print("No card has been played")
-                    break
-                else:           # card is not valid
-                    print("Card cannot be played! Choose another card.")
-            if curr_player.hand_is_empty():  # winning condition, players hand is empty
+    def run(self):
+        """Starts the game"""
+        self.amount_of_players = self.set_amount_of_players()
+        self.name_players()
+        self.deal_cards_to_players()
+        self.pile_of_cards.add_card_to_deck(self.deck_of_cards.draw())  # first open card
+        while True:  # game loop
+            self.next_turn()
+            self.info_prints()
+            self.player_chooses_option()
+            self.evaluate_option()
+            if self.curr_player.hand_is_empty():  # winning condition, players hand is empty
                 print("Mau Mau!")
                 self.score_count()
                 break
-            players_turn = (players_turn + 1) % self.amount_of_players
-            input("next turn")
+            input("next turn!")
 
     @staticmethod
     def clear_screen():
