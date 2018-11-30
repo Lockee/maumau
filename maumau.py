@@ -18,6 +18,8 @@ class Maumau:
         self.card_index = -1
 
     def name_players(self):
+        """gives every player a name, if no name is given the standard name
+           PlayerX will be given"""
         self.players = []
         for i in range(self.amount_of_players):
             player_name = input("Please state your name player"+str(i+1)+": ")
@@ -27,6 +29,7 @@ class Maumau:
             self.players.append(new_player)
 
     def set_amount_of_players(self):
+        """asks how many players are playing, can be between 2 and 4 players"""
         while True:
             amount_of_players = input("How many players are playing(2-4): ")
             if amount_of_players.isdigit() and 2 <= int(amount_of_players) <= 4:
@@ -35,6 +38,8 @@ class Maumau:
                 print("the number has to be between 2 and 4")
 
     def deal_cards_to_players(self):
+        """Asks how many cards should the player start with and then distributes this
+           amount of cards to the players"""
         amount_of_cards = 0
         while True:
             amount = input("How many cards should the players have at the start(3-5)?: ")
@@ -104,6 +109,8 @@ class Maumau:
                 self.deck_of_cards.shuffle()
 
     def info_prints(self):
+        """prints some statistics which would be visible in the real card game,
+           like the amount of cards in the other players hand and it's own cards"""
         print("Amount of cards in deck left:", len(self.deck_of_cards))
         print("Amount of cards on pile:", len(self.pile_of_cards))
         top_card = self.pile_of_cards.top()
@@ -118,6 +125,7 @@ class Maumau:
         print(self.curr_player, "d. Draw a Card", sep="")
 
     def player_chooses_option(self):
+        """player input, asks if he/she wants to play or to draw a card"""
         while True:  # run as long as input is invalid
             card_index = input("Which card do you want to play?: ")
             if card_index.isdigit():
@@ -136,6 +144,9 @@ class Maumau:
             break
 
     def evaluate_option(self):
+        """a card will be drawn, card_was_drawn evaluates to True,
+           if possible the player gets the choice to play it right away,
+           otherwise the player plays the card with the index of card_index"""
         if self.card_was_drawn:
             drawn_card = self.deck_of_cards.draw()
             print(drawn_card, "has been drawn.")
