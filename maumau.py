@@ -92,7 +92,7 @@ class Maumau:
 
     def rule_card_eight(self):
         """ TODO: Add rule for a eight"""
-        print(self.players[(self.turn+1) % self.amount_of_players].name, 
+        print(self.players[(self.turn+1) % self.amount_of_players].name,
               "has to skip a turn")
         self.skip = True
         self.card_rule = None
@@ -185,10 +185,12 @@ class Maumau:
                 if self.jack_color == self.curr_player.hand[self.card_index].color:
                     self.jack_color = None
                     break
-                elif self.jack_color and self.jack_color != self.curr_player.hand[self.card_index].color:
+                elif (self.jack_color and
+                      self.jack_color != self.curr_player.hand[self.card_index].color):
                     print("Please lay a card with the previous wished color down!")
                     continue
-                elif not self.pile_of_cards.card_is_playable(self.curr_player.hand[self.card_index]):
+                elif not self.pile_of_cards.card_is_playable(
+                              self.curr_player.hand[self.card_index]):
                     print("Card is cannot be played, choose another card!")
                     continue
             elif card_index.lower() == "d":
