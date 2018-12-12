@@ -1,6 +1,8 @@
 """Player class, it contains the name of the player, hand of cards
     and the final score"""
 
+import card
+
 
 class Player():
     def __init__(self, name):
@@ -15,6 +17,14 @@ class Player():
     def add_card_to_hand(self, card):
         """adds a card object to the players hand"""
         self.hand.append(card)
+
+    def has_card_in_hand(self, num):
+        compare_card = card.Card(str(num), "", "")
+        indices = []
+        for i, acard in enumerate(self.hand):
+            if acard.is_same_number(compare_card):
+                indices.append(i)
+        return indices
 
     def last_card(self):
         """returns true if only one card is left"""
